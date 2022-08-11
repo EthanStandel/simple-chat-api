@@ -1,0 +1,9 @@
+# Service port
+export SCA_PORT=
+# Database
+export SCA_DB_USERNAME=
+export SCA_DB_PASSWORD=
+export SCA_DB_HOST=
+export SCA_DB_PORT=
+export SCA_DB_DB=
+export SCA_DB_SSLMODE=
