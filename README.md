@@ -27,3 +27,10 @@ go run main.go
 go build
 simple-chat-api
 ```
+
+## Technical & security model
+
+- Uses each users password hash as their JWT signature key. This is slow for initial
+lookups but the user enitities can be cached to increase performance. The benefit of 
+this model is that all user's sessions can be invalidated by changing their password
+(must notify cache), while not having to maintain a session ID table and lookups.

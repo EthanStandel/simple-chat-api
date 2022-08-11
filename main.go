@@ -10,6 +10,6 @@ import (
 
 func main() {
 	app := fiber.New()
-	routes.Build(app.Group("/api"))
+	routes.Build(*app, app.Group("/api"))
 	log.Fatal(app.Listen(os.Getenv("SCA_PORT")))
 }

@@ -5,6 +5,7 @@ import (
 	"simple-chat-api/utils/security"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type Credentials struct {
@@ -16,7 +17,11 @@ type AuthError struct {
 	ErrorType string `json:"errorType"`
 }
 
-func Auth(router fiber.Router) {
+type TokenResponse struct {
+	Token string `json:"token"`
+}
+
+func AuthRoutes(router fiber.Router) {
 	router.Post("/register", func(c *fiber.Ctx) error {
 		creds := new(Credentials)
 		c.BodyParser(creds)
@@ -25,6 +30,7 @@ func Auth(router fiber.Router) {
 			return c.Status(fiber.StatusBadRequest).
 				JSON(AuthError{ErrorType: "PASSWORD_REQUIREMENTS"})
 		}
+
 		entity := db.UserEntity{
 			Username: creds.Username,
 			Passhash: security.HashPassword(creds.Password),
@@ -58,6 +64,16 @@ func Auth(router fiber.Router) {
 				JSON(AuthError{ErrorType: "BAD_AUTH"})
 		}
 
-		return c.JSON(creds)
+		token, err := jwt.NewWithClaims(
+			jwt.SigningMethodHS256,
+			jwt.MapClaims{"uid": entity.Username},
+		).SignedString([]byte(entity.Passhash))
+
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).
+				JSON(AuthError{ErrorType: "JWT_FAIL"})
+		}
+
+		return c.JSON(TokenResponse{Token: token})
 	})
 }
